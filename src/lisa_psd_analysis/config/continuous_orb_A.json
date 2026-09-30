@@ -1,0 +1,25 @@
+{
+  "channel": "A",
+  "mode": "continuous",
+  "model": "orb",
+  "knots_hz": [
+    0.000358084713867016,
+    0.0006181958484545834,
+    0.0009363520029620533,
+    0.0014131667553472303,
+    0.0025239631170021646,
+    0.0029675119123670247,
+    0.0033417584984004956,
+    0.0037226133184008916,
+    0.004204711447932627,
+    0.006551637432896547,
+    0.02352055776771861,
+    0.05180771842415733
+  ],
+  "pilot_scope": "thinned continuous A, one archived realisation; conditional chi-square replicates are not new time-series simulations",
+  "selection": "variation RMS, 10% uniform floor, thinned training-only penalised MLE",
+  "posterior_structure": "shared-frequency stationary_plus_interaction",
+  "frequency_basis": 16,
+  "time_basis": 6,
+  "full_resolution_validation": "pending"
+}

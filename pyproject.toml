@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lisa-psd-analysis"
+version = "0.1.0"
+description = "Reproducible LISA spectral analysis with LogPSplinePSD"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "LogPSplinePSD",
+  "backgrounds==0.1.4",
+  "lisaorbits==3.0.3",
+  "astropy==7.2.0",
+  "wdm-transform==0.5.0",
+  "jax==0.9.1",
+  "numpyro==0.20.0",
+  "numpy==2.4.3",
+  "scipy",
+  "h5py",
+  "xarray",
+]
+
+[project.scripts]
+lisa-study = "lisa_psd_analysis.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.12"]
+
+[tool.uv.sources]
+logpsplinepsd = {path = "../LogPSplinePSD", editable = true}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+lisa_psd_analysis = ["config/*.json"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,43 @@
+{
+  "date": "2026-09-29",
+  "source_repository": "wdm_psd workspace",
+  "note": "Scientific helpers copied/extracted; imports made local and formatting updated. No legacy inference runtime dependency. Hpara runner re-expressed with generic package likelihood.",
+  "files": {
+    "galactic.py": {
+      "source": "wdm_psd/tv_pspline_psd/galactic.py",
+      "source_sha256": "e1a3246928f61da625d7f65ea3202df0f864b8bdeae3d3896583fc86adb59a27"
+    },
+    "wdm_projection.py": {
+      "source": "wdm_psd/tv_pspline_psd/wdm_projection.py",
+      "source_sha256": "c3bc024b5f7dcea457a5ab6411269e95f03bc4b8ca4509216d60e20978641e16"
+    },
+    "parametric_response.py": {
+      "source": "lisa_data_generation/src/lisa_study/parametric_response.py",
+      "source_sha256": "b1b701532bb1c4244a54ede2d5e36b54e62aa5469d25cce30de3f5a34f0d1a85"
+    },
+    "preparation.py": {
+      "source": "lisa_data_generation/src/lisa_study/run_surface_study.py",
+      "source_sha256": "17b7d072e64973c4ae27ef85892cb1007f4da9c7ef97c98a12eea06ed8e2cd7f"
+    },
+    "generation.py": {
+      "source": "lisa_data_generation/src/lisa_study/generation.py",
+      "source_sha256": "c5a973b524ae4b5975a3481f06a9eadde36f62d8a2d576b2d9e595a80eddc52f"
+    },
+    "galactic_synthesis.py": {
+      "source": "lisa_data_generation/src/lisa_study/galactic_synthesis.py",
+      "source_sha256": "576f65f2cd846d15a1836fb27b27e0977c4f42545dbdc251544b8288ec918878"
+    },
+    "dataset_bundle.py": {
+      "source": "lisa_data_generation/src/lisa_study/dataset_bundle.py",
+      "source_sha256": "0d899d813794dd17d1530c794bd839224796d1344ffab7d1748e960642162934"
+    },
+    "generate.py": {
+      "source": "lisa_data_generation/generate_data.py",
+      "source_sha256": "02c1ab26021e00e33fb114f451bbbfc3fd89167429e2604135249577ad0e9ef0"
+    },
+    "lisa_aet.py": {
+      "source": "wdm_psd/tv_pspline_psd/lisa_aet.py",
+      "source_sha256": "1bea787e2807fa1dd04d7c1420ecd275c9560ab378151dda139b3f7416ed6df6"
+    }
+  }
+}

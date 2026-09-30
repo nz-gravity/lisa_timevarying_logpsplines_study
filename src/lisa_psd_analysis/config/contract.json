@@ -1,0 +1,11 @@
+{
+  "tdi_total_sha256": "fcf0d98a38f030b543f32370f245ef04b21ea26580db26daef40a06fee1b122c",
+  "shape": [
+    3,
+    15728640
+  ],
+  "dtype": "float64",
+  "dt_seconds": 2.0,
+  "gap_schedule_sha256": "ac06e31dc797066b70a1d87cd0b2a0ffb0ea12900d03d5bf1e22dc0c248fee4d",
+  "scope": "Frozen training/validation-selected knots from the four final agnostic fits; only valid for this paired dataset and schedule."
+}

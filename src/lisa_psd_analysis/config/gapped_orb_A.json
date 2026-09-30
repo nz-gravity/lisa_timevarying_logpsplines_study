@@ -1,0 +1,25 @@
+{
+  "channel": "A",
+  "mode": "gapped",
+  "model": "orb",
+  "knots_hz": [
+    0.00034834547411259913,
+    0.0005997135440551018,
+    0.0009090017896608504,
+    0.001383267500417227,
+    0.0025182364344205708,
+    0.00297657728071574,
+    0.0033636384114030774,
+    0.0037595019132692113,
+    0.004273604455518113,
+    0.008401147478020114,
+    0.028355175890839777,
+    0.05273467565399663
+  ],
+  "pilot_scope": "thinned gapped A; actual gated WDM powers, 71 frozen outages and one-hour tapers",
+  "selection": "variation RMS, 10% uniform floor, thinned training-only penalised MLE",
+  "posterior_structure": "shared-frequency stationary_plus_interaction",
+  "frequency_basis": 16,
+  "time_basis": 6,
+  "full_resolution_validation": "pending"
+}
