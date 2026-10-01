@@ -7,6 +7,7 @@ import h5py
 import numpy as np
 from log_psplines import PowerConfig
 
+from .configuration import load_config, paper_config_dir
 from .dataset_bundle import file_hash
 from .diagnostics import heldout_metrics
 from .fitting import fit_parametric, fit_surface
@@ -19,16 +20,25 @@ def run_analysis(
     output: Path,
     *,
     profile="smoke",
-    models=("Hagn", "Horb", "Hpara"),
-    channels=("A",),
+    models=None,
+    channels=None,
     warmup=None,
     samples=None,
-    chains=2,
+    chains=None,
     knots=None,
     max_tree_depth=None,
+    config: Path | None = None,
 ):
     """Fit selected hypotheses and save posterior results with a run receipt."""
     bundle, output = Path(bundle), Path(output)
+    options = load_config(config, "analysis") if config else {}
+    profile = options.get("profile", profile)
+    models = (
+        models
+        if models is not None
+        else options.get("models", ("Hagn", "Horb", "Hpara"))
+    )
+    channels = channels if channels is not None else options.get("channels", ("A",))
     if profile not in ("smoke", "paper") or not models or not channels:
         raise ValueError("choose a profile, at least one model and one channel")
     if set(models) - {"Hagn", "Horb", "Hpara"} or set(channels) - {"A", "E"}:
@@ -39,23 +49,47 @@ def run_analysis(
         len(models) != 1 or len(channels) != 1 or models[0] == "Hpara"
     ):
         raise ValueError("--knots requires one surface model and one channel")
-    settings = dict(
-        n_warmup=warmup if warmup is not None else (2200 if profile == "paper" else 8),
-        n_samples=samples
-        if samples is not None
-        else (4000 if profile == "paper" else 8),
+    if profile == "paper":
+        settings = load_config(paper_config_dir() / "hagn.json", "analysis")[
+            "settings"
+        ].copy()
+    else:
+        settings = dict(
+            n_warmup=8,
+            n_samples=8,
+            num_chains=2,
+            max_tree_depth=4,
+            target_accept_prob=0.85,
+            spectrum_draws=2,
+            spectrum_chunk_size=4,
+            progress_bar=False,
+        )
+    settings.update(options.get("settings", {}))
+    for key, value in dict(
+        n_warmup=warmup,
+        n_samples=samples,
         num_chains=chains,
-        max_tree_depth=max_tree_depth
-        if max_tree_depth is not None
-        else (12 if profile == "paper" else 4),
-        target_accept_prob=0.99 if profile == "paper" else 0.85,
-        spectrum_draws=2,
-        spectrum_chunk_size=4,
-        progress_bar=False,
-    )
+        max_tree_depth=max_tree_depth,
+    ).items():
+        if value is not None:
+            settings[key] = value
     PowerConfig(**settings)  # Validate sampler settings before creating outputs.
+    seeds = (
+        options.get("random_seeds")
+        or load_config(paper_config_dir() / "hagn.json", "analysis")["random_seeds"]
+    )
     receipt = dict(
         profile=profile,
+        config=json.loads(Path(config).read_text()) if config else None,
+        config_sha256=file_hash(config) if config else None,
+        explicit_knots=json.loads(Path(knots).read_text()) if knots else None,
+        explicit_knots_sha256=file_hash(knots) if knots else None,
+        paper_assets_sha256={
+            p.name: file_hash(p) for p in paper_config_dir().glob("*.json")
+        }
+        if profile == "paper"
+        else {},
+        random_seeds=seeds,
         settings=settings,
         bundle=str(bundle.resolve()),
         bundle_sha256=file_hash(bundle),
@@ -87,11 +121,23 @@ def run_analysis(
                 )
                 if name == "Hpara":
                     g = h["para"]
-                    result = fit_parametric(h, settings)
+                    result = fit_parametric(h, settings, seed=seeds["parametric"])
                     truth = g["truth"][()]
                 else:
                     g = h["native"]
-                    result = fit_surface(h, settings, name, channel, profile, knots)
+                    result = fit_surface(
+                        h,
+                        settings,
+                        name,
+                        channel,
+                        profile,
+                        knots,
+                        seed=seeds[
+                            "gapped_surface"
+                            if h.attrs["mode"] == "gapped"
+                            else "surface"
+                        ],
+                    )
                     truth = g["truth"][..., ("A", "E", "T").index(channel)]
                 result.metadata.update(
                     analysis=label,

@@ -1,37 +1,40 @@
-# Validation record
+# Validation
 
-## Local cleanup validation — 2026-09-29
+Artifact verification and convergence are separate gates. `verify` checks
+input identity, posterior metadata, finite likelihoods, positive spectra and
+draw/chain counts. `verify-release` additionally checks the full manifest,
+checksums, config/provenance consistency and relocated scientific artifacts.
+Neither certifies convergence or manuscript completeness.
 
-- Seven tests pass: foreground formula, differentiable density, covariance
-  rotation, WDM projection, split boundaries, input integrity, installed CLI
-  and small dataset generation.
-- Continuous and gapped smoke runs completed for Hagn A/E, Horb A/E and
-  joint Hpara A/E/T. All ten runs passed artifact verification.
-- Every saved parameter draw in those ten fits is identical to its
-  pre-cleanup counterpart. All 25 gapped preparation datasets are identical.
-- The automatic ESA orbit download and HDF5 generation command completed.
-- Ruff, Python compilation and shell syntax checks pass.
+## Local cleanup — 2026-10-01
 
-The local smoke runs use eight warmup and eight retained draws per chain.
-These are execution and regression checks, not convergence tests. The full-year
-foreground generator has not been rerun as part of the cleanup; its small-data
-I/O and correlated-synthesis path are covered by a response-fixture test.
+The offline synthetic fixture exercises generation, real WDM preparation,
+Hagn A/E, Horb A/E and joint Hpara fits, saved-result verification, reconstruction
+figures and an explicit scientific release. The fixture and short chains are
+execution checks; they do not validate LISA recovery or annual modulation.
 
-## OzSTAR pilot submitted — 2026-09-29
+The test suite covers A/E/T rotation, foreground formulas, the seven-parameter
+LISA adapter density, WDM projection/split boundaries, deterministic fixtures,
+preparation axes/metadata, input integrity, paper configs, provenance,
+release traversal/missing-input/tampering failures and saved-result figures.
+It does not run expensive paper chains or fetch study datasets.
 
-The isolated campaign is
-`/fred/oz200/avajpeyi/projects/LISA_PSD/20260929_case_study/`.
-It installs the locked environment against the sibling LogPSplinePSD snapshot.
+The final local checks and fresh-checkout smoke result are recorded in
+`docs/cleanup.md`. CI runs `uv sync --locked`, `pytest`, `ruff check .` and
+`ruff format --check .` against the pinned sibling library.
 
-| Mode | Preparation | Hagn A | Horb A | Hpara A/E/T |
-| --- | --- | --- | --- | --- |
-| Continuous | 17662596 | 17662597 | 17662598 | 17662599 |
-| Gapped | 17662600 | 17662601 | 17662602 | 17662603 |
+Existing 2026-09-29 validation/campaign products are local, ignored artifacts.
+They have not been promoted to final publication results or rerun during this
+cleanup. No OzSTAR connection or submission was performed.
 
-Both modes use full data resolution and the packaged A knot layouts, with eight
-warmup/eight retained draws per chain and maximum tree depth six. Inference
-jobs depend on preparation success. Job acceptance is not a completed
-reproducibility check; inspect the logs, verification files and sampler
-diagnostics after completion.
-The release still needs converged full-duration comparisons and finalized E
-surface layouts before claiming reproduction of every paper result.
+## Publication gates
+
+Inspect R-hat, ESS, divergences, tree-depth saturation, E-BFMI, posterior
+recovery and comparison on common support. Final E layouts, selected converged
+results and the complete manuscript figure/table mapping remain prerequisites;
+see the [freeze checklist](reproducibility.md).
+
+The library currently writes complex/HDF5-backed `.nc` files using h5netcdf's
+nonstandard NetCDF features. This study verifies them through `PSDResult`;
+portability to arbitrary NetCDF clients is not established here. This is an
+external library format limitation, not an inference change in this study.

@@ -44,7 +44,7 @@ def test_generation_input_contract_and_cli(tmp_path):
 
 
 def test_generate_small_dataset_with_response_fixture(tmp_path, monkeypatch):
-    from lisa_psd_analysis import generation
+    from lisa_psd_analysis import _generation as generation
 
     monkeypatch.setattr(generation, "SYNTHESIS_LENGTH", 32)
     monkeypatch.setattr(generation, "SYNTHESIS_HOP", 16)

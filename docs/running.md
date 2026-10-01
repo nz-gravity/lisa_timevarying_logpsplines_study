@@ -1,62 +1,79 @@
 # Running an analysis
 
-## Gapped data
+All commands run from the study checkout with its `.venv`, managed by
+`uv sync --locked`. Keep the sibling library at `configs/library.json`'s commit.
+Choose new output paths: existing datasets, results and figure directories are
+never overwritten.
+
+## Smoke test
+
+Follow the README's offline sequence. `generate --demo` creates synthetic
+Gaussian XYZ samples, an artificial response and a static triangle orbit
+fixture. It exercises the real preparation and all three fit paths, but has
+no scientific recovery interpretation. Paper preparation rejects this fixture.
+The default smoke profile prepares 8192 samples and fits two chains with eight
+warmup/eight retained draws, acceptance .85 and tree depth four.
+
+For a smoke check on the real dataset instead:
 
 ```sh
-uv run --locked lisa-study prepare data/lisa.h5 output/gapped.h5 --mode gapped
-uv run --locked lisa-study fit output/gapped.h5 output/gapped-run --channels A E
+uv run lisa-study prepare data/lisa.h5 build/smoke-real.h5
+uv run lisa-study fit build/smoke-real.h5 results/smoke-real --channels A E
+uv run lisa-study verify results/smoke-real
 ```
 
-The smoke profile uses a short time-series prefix and one artificial gap.
-It does not represent the year-long gap schedule.
+`prepare --mode gapped` uses one artificial short gap in the smoke profile.
 
-## Full resolution
+## Development run
+
+Use explicit overrides for an execution check on the full-resolution bundle:
 
 ```sh
-uv run --locked lisa-study prepare data/lisa.h5 output/paper.h5 --profile paper
-uv run --locked lisa-study fit output/paper.h5 output/paper-run --profile paper
+uv run lisa-study prepare data/lisa.h5 build/development.h5 --config configs/paper/dataset.json
+uv run lisa-study fit build/development.h5 results/development \
+  --config configs/paper/horb.json --warmup 8 --samples 8 --max-tree-depth 6
+uv run lisa-study verify results/development
 ```
 
-Use `--mode gapped` during preparation for the fixed gap schedule. Preparation
-uses the full dataset, WDM `nt=2048`, 16 frequency-projection nodes and 16
-spectral-interpolation nodes. The fit defaults are 2200 warmup and 4000 retained
-samples per chain, two chains, target acceptance .99 and maximum tree depth 12.
-For a full-resolution execution check, add `--warmup 8 --samples 8 --max-tree-depth 6` to `fit`.
+This is a full-resolution **execution check**, not a converged paper analysis.
+The supplied config selects the paper profile; flags override its settings
+and the effective values are recorded in `run.json`.
 
-Both preparation and fitting must select `--profile paper`. Increasing only
-the iterations of a smoke run cannot reproduce the full-resolution analysis.
+## Full paper settings
 
-Select hypotheses with `--models Hagn Horb Hpara`. The supplied full-resolution
-spline layouts cover **A**: Hagn has 10 time and 128 frequency interior knots;
-Horb has 3 time and 12 frequency interior knots. Both use HalfNormal(10)
-smoothing scales; Horb has a HalfNormal(.5) interaction amplitude.
+[Reproducibility](reproducibility.md) lists the complete available run sequence.
+Preparation uses full data, WDM `nt=2048`, the original masks/partitions,
+16 projection nodes and 16 spectral nodes. Fits use 2200 warmup, 4000 retained
+draws per chain, two chains, acceptance .99 and maximum tree depth 12.
+The legacy `--profile paper` interface still selects these versioned settings.
 
-For another dataset or a full-resolution E fit, select one surface model and
-channel and supply `--knots path/to/layout.json`. The JSON fields are `channel`,
-`mode`, `model` (`agn` or `orb`), `knots_hz`, and, for Hagn, `knots_time`.
-The supplied layouts check the dataset identity before use. Full-resolution E
-layouts still need to be finalized for the reproducibility release.
+Hagn's A layouts have 10 time/128 frequency interior knots; Horb has 3 time/12
+frequency knots. HalfNormal(10) roughness and Horb's HalfNormal(.5) interaction
+are unchanged. Layouts check the dataset identity before use. Paper E layouts
+remain unfinished; do not apply A layouts to E.
 
-## Outputs
+For another dataset or an E surface fit, select one model/channel and provide
+`--knots path/to/layout.json`. Fields: `channel`, `mode`, `model` (`agn`/`orb`),
+`knots_hz`, and `knots_time` for Hagn. This defines a separate development
+analysis until its settings and results have been validated for the paper.
+Hpara fits A/E/T jointly; `--channels` selects only surface-model channels.
 
-Each hypothesis saves:
+## Outputs and validation
 
-- `inference_data.nc`: parameter draws, sampler statistics, truth and spectral summaries.
-- `posterior_spectrum.png`: truth, posterior median and log-ratio panels.
-- `diagnostics/`: sampling statistics, spectrum statistics and an energy plot.
-- `physical_parameters.json`: Hpara physical parameter draws.
+Each analysis writes `inference_data.nc`, reconstruction and diagnostic PNGs,
+and diagnostic statistics. Hpara also writes `physical_parameters.json`.
+`run.json` records completion, effective sampler settings, input identity,
+code/dependency receipts, config hashes, seeds and held-out metrics.
 
-`run.json` records completion, settings, input checksum, code fingerprints,
-dependency versions and held-out metrics. `lisa-study verify RUN` checks
-artifact integrity, draw counts, finite likelihoods and positive spectra.
-If the prepared bundle has moved, use `verify RUN --bundle NEW_PATH`.
-Verification does not establish MCMC convergence: inspect R-hat, ESS,
-divergences, energy diagnostics and parameter recovery.
+`lisa-study verify RUN` checks artifacts and the prepared input checksum.
+Use `--bundle NEW_PATH` if that bundle has moved. Verification checks finite
+likelihoods, positive spectra and draw counts, not convergence. Assess R-hat,
+ESS, divergences, energy and recovery before interpreting any run.
 
-Every parameter draw is saved. Spectral arrays store two preview draws per
-chain to bound file size; means and 5/50/95 percentiles use every draw.
-Keep the prepared bundle with the results, especially for Hpara reconstruction.
+Every parameter draw is saved. Spectral arrays retain two preview draws per
+chain; means and 5/50/95 percentiles use every draw. Keep prepared bundles for
+inspection/reconstruction, especially Hpara response operators.
 
-The held-out metrics use each fit's native or pooled grid. They are not a
-substitute for a comparison on common support or the complete publication
-figure suite.
+The held-out metrics use each fit's native/pooled grid; they are not a
+common-support model comparison. `figures` exports reconstruction panels and
+these existing metrics without rerunning inference.

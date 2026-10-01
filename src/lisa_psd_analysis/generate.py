@@ -11,9 +11,17 @@ def generate_dataset(
     source: Path | None = None,
     noise: Path | None = None,
     orbits: Path | None = None,
+    demo: bool = False,
 ) -> Path:
     """Combine a correlated foreground with supplied noise and embed both inputs."""
-    from .generation import build_dataset
+    output = Path(output)
+    if demo:
+        if any(value is not None for value in (source, noise, orbits)):
+            raise ValueError("--demo cannot be combined with scientific inputs")
+        from ._demo import generate_demo
+
+        return generate_demo(output)
+    from ._generation import build_dataset
 
     if source is not None and (noise is not None or orbits is not None):
         raise ValueError("choose a source bundle or explicit noise and orbit files")
@@ -28,9 +36,11 @@ def generate_dataset(
     temporary = output.with_suffix(".building.h5")
     if temporary.exists():
         raise FileExistsError(temporary)
-    build_dataset(temporary, noise_path=noise, orbit_path=orbits)
-    embed_inputs(temporary, noise, orbits)
-    # An exclusive link avoids overwriting an output created during generation.
-    output.hardlink_to(temporary)
-    temporary.unlink()
+    try:
+        build_dataset(temporary, noise_path=noise, orbit_path=orbits)
+        embed_inputs(temporary, noise, orbits)
+        # An exclusive link avoids overwriting an output created during generation.
+        output.hardlink_to(temporary)
+    finally:
+        temporary.unlink(missing_ok=True)
     return output

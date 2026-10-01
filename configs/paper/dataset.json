@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "kind": "preparation",
+  "profile": "paper",
+  "nt": 2048,
+  "taper_seconds": 3600.0,
+  "projection_nodes": 16,
+  "spectral_nodes": 16
+}

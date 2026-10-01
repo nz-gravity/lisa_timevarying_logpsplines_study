@@ -5,6 +5,8 @@ from pathlib import Path
 
 import numpy as np
 
+from .configuration import paper_config_dir
+
 
 def surface_config(h, name, channel, profile, knot_file=None):
     """Choose a spline structure and validate any explicit knot layout."""
@@ -22,7 +24,7 @@ def surface_config(h, name, channel, profile, knot_file=None):
                 raise ValueError(
                     "Paper E fits require an explicit --knots file for this model/channel"
                 )
-            config_dir = Path(__file__).parent / "config"
+            config_dir = paper_config_dir()
             contract = json.loads((config_dir / "contract.json").read_text())
             if (
                 h.attrs["tdi_total_sha256"] != contract["tdi_total_sha256"]

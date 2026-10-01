@@ -27,3 +27,45 @@ def runtime_receipt() -> dict:
             if d.metadata["Name"]
         },
     }
+
+
+def git_receipt(root: Path) -> dict:
+    """Record a source checkout commit and whether tracked/untracked work remains."""
+    import subprocess
+
+    def git(*args: str) -> str | None:
+        process = subprocess.run(
+            ["git", "-C", str(root), *args], capture_output=True, text=True, check=False
+        )
+        return process.stdout.strip() if process.returncode == 0 else None
+
+    sha = git("rev-parse", "HEAD")
+    status = git("status", "--porcelain")
+    return {"git_sha": sha, "dirty": bool(status) if status is not None else None}
+
+
+def release_provenance(root: Path, seeds: dict, configs: dict) -> dict:
+    """Generate an archival environment receipt; missing Git identity stays explicit."""
+    import platform
+    from datetime import UTC, datetime
+
+    receipt = runtime_receipt()
+    library_root = Path(log_psplines.__file__).resolve().parents[2]
+    return {
+        "schema": 1,
+        "study_repository_url": "https://github.com/nz-gravity/lisa_timevarying_logpsplines_study",
+        "study": git_receipt(root),
+        "logpsplinepsd": {
+            "version": receipt["package_version"],
+            **git_receipt(library_root),
+        },
+        "python_version": platform.python_version(),
+        "dependency_lock_sha256": file_hash(root / "uv.lock"),
+        "jax_version": importlib.metadata.version("jax"),
+        "numpyro_version": importlib.metadata.version("numpyro"),
+        "platform": platform.platform(),
+        "random_seeds": seeds,
+        "paper_configs": configs,
+        "created_at": datetime.now(UTC).isoformat(),
+        "runtime": receipt,
+    }

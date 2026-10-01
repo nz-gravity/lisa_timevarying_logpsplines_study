@@ -1,0 +1,32 @@
+name: Study checks
+on: [push, pull_request]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      MPLBACKEND: Agg
+      JAX_ENABLE_X64: 'true'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: lisa_timevarying_logpsplines_study
+      - name: Read pinned library commit
+        id: library
+        working-directory: lisa_timevarying_logpsplines_study
+        run: echo "sha=$(python -c 'import json; print(json.load(open("configs/library.json"))["git_sha"])')" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: nz-gravity/LogPSplinePSD
+          ref: ${{ steps.library.outputs.sha }}
+          path: LogPSplinePSD
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.12'
+      - name: Install and check (no study downloads)
+        working-directory: lisa_timevarying_logpsplines_study
+        run: |
+          uv sync --locked
+          uv run pytest
+          uv run ruff check .
+          uv run ruff format --check .

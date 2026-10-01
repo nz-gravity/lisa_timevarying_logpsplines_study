@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kind": "analysis",
+  "profile": "paper",
+  "models": [
+    "Hpara"
+  ],
+  "channels": [
+    "A"
+  ],
+  "settings": {
+    "n_warmup": 2200,
+    "n_samples": 4000,
+    "num_chains": 2,
+    "max_tree_depth": 12,
+    "target_accept_prob": 0.99,
+    "spectrum_draws": 2,
+    "spectrum_chunk_size": 4,
+    "progress_bar": false
+  },
+  "random_seeds": {
+    "surface": 20260812,
+    "gapped_surface": 20260813,
+    "parametric": 20260906
+  }
+}

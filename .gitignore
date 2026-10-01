@@ -12,3 +12,8 @@ logs/
 dist/
 build/
 .DS_Store
+results/
+figures/
+release/
+graphify-out/
+*.md

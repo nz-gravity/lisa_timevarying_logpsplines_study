@@ -1,89 +1,66 @@
-# OzSTAR
+# Manual OzSTAR runs
 
-The supplied Slurm scripts use account `oz200`, six CPUs and 32 GB per job.
-OzSTAR chooses the partition from the requested resources. Change the resource
-requests for another allocation or cluster. All sampling runs on compute nodes.
+These instructions and scripts are for the researcher to run manually. No
+remote jobs are submitted by the local tests or cleanup tooling.
+The supplied jobs request account `oz200`, six CPUs and 32 GB. Adjust resources
+for your allocation. All inference runs on compute nodes.
 
-## Stage an isolated copy
+## Stage and install
 
-From the local case-study checkout:
+Choose a new campaign directory, then run locally:
 
 ```sh
-bash scripts/stage_ozstar.sh /fred/oz200/avajpeyi/projects/LISA_PSD/run-YYYYMMDD
+bash scripts/stage_ozstar.sh /absolute/remote/campaign/path
 ```
 
-The destination must be new. The script copies the case-study source and the
-current LogPSplinePSD implementation, including uncommitted changes. It excludes
-local environments, output data and Git internals. It does not alter existing
-campaigns.
+The helper uses SSH/rsync to copy both checkouts into that new directory.
+It excludes data, results, environments and Git internals. It copies the
+current library implementation; ensure the checkout matches
+`configs/library.json` and is clean before staging a paper campaign.
 
-## Install on the login node
+After logging into OzSTAR yourself, install from the staged study directory:
 
 ```sh
-ssh ozstar
-cd /fred/oz200/avajpeyi/projects/LISA_PSD/run-YYYYMMDD/lisa_psd_analysis
+cd /absolute/remote/campaign/path/lisa_timevarying_logpsplines_study
 module load gcc/13.3.0 python/3.12.3
 export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_LOGPSPLINEPSD="$(cat ../logpspline-version.txt)"
 uv sync --locked
 ```
 
-The version variable lets the library build from a source snapshot without
-Git metadata. Supply the study dataset at an absolute path on the cluster.
-Check it against the input hashes accompanying the deposit.
+Supply the exact study dataset separately and compare its deposit checksums.
+A staged snapshot has no Git checkout identity: preserve the local source
+commit receipts alongside the campaign before publication.
 
 ## Preview and submit
 
+From the staged study checkout:
+
 ```sh
-bash slurm/submit.sh /absolute/path/lisa.h5 output/pilot --warmup 8 --samples 8 --max-tree-depth 6
-bash slurm/submit.sh /absolute/path/lisa.h5 output/pilot --execute --warmup 8 --samples 8 --max-tree-depth 6
+bash slurm/submit.sh /absolute/path/lisa.h5 results/pilot --warmup 8 --samples 8 --max-tree-depth 6
+bash slurm/submit.sh /absolute/path/lisa.h5 results/pilot --execute --warmup 8 --samples 8 --max-tree-depth 6
 ```
 
-The first command prints the job commands. The second submits two
-full-resolution preparation jobs, followed by six fits: Hagn A, Horb A and
-joint Hpara A/E/T, each for continuous and gapped observations. Each fit waits
-for its corresponding preparation job to succeed. Job IDs go to
-`output/pilot/jobs.tsv`; logs go to `output/pilot/logs/`.
+The first command previews. The second submits two full-resolution preparation
+jobs followed by dependent Hagn A, Horb A and Hpara A/E/T fits for both modes.
+IDs and logs live beneath the output root. This pilot checks execution only.
 
-After the execution pilot is valid, omit `--warmup`/`--samples` and choose a
-fresh output root to use the paper-length sampler settings. E surface jobs
-require their explicit layouts before they can join this campaign.
+Reuse valid prepared bundles for full paper settings:
+
+```sh
+bash slurm/submit_main.sh results/pilot results/paper-cluster
+bash slurm/submit_main.sh results/pilot results/paper-cluster --execute
+```
+
+The six fits use the versioned paper settings via the backwards-compatible
+`--profile paper` interface. Walltime defaults to 24 hours; `--time HH:MM:SS`
+overrides it. Choose a new output root. Paper E layouts remain unfinished.
 
 ```sh
 squeue -u "$USER"
 sacct -j JOB_ID --format=JobID,JobName,State,ExitCode,Elapsed,MaxRSS
-.venv/bin/lisa-study verify output/pilot/continuous-Hagn
+.venv/bin/lisa-study verify results/paper-cluster/continuous-Hagn
 ```
 
-Check all six fit directories. A scheduler success is an execution result;
-assess convergence and recovery separately before interpreting the posteriors.
-
-## Main fits using the pilot's prepared bundles
-
-The full-resolution pilot bundles can be reused. This submits six fits with the
-paper defaults: 2200 warmup and 4000 retained draws per chain, two chains,
-target acceptance .99 and maximum tree depth 12. Hagn and Horb fit A; Hpara
-fits A/E/T jointly. Use a fresh output root.
-
-First copy the new submission helper from your local case-study checkout to
-the existing staged checkout:
-
-```sh
-rsync -av slurm/submit_main.sh ozstar:/fred/oz200/avajpeyi/projects/LISA_PSD/20260929_case_study/lisa_psd_analysis/slurm/
-```
-
-Then, on OzSTAR, from the staged case-study checkout:
-
-```sh
-bash slurm/submit_main.sh output/repro-pilot output/main-20260929
-bash slurm/submit_main.sh output/repro-pilot output/main-20260929 --execute
-```
-
-The first command previews all six `sbatch` calls. The second submits them
-and writes IDs to `output/main-20260929/jobs.tsv`. Jobs use a 24-hour walltime
-by default; `--time HH:MM:SS` overrides it if the partition allows a longer
-request. Check the partition limit before raising it. These fits do not depend
-on a new preparation job because both prepared bundles already exist.
-
-Full-resolution Hagn/Horb E runs need separately validated E knot layouts;
-the old WDM test-code layouts are not interchangeable with the A layouts
-frozen here. They are not part of this submission.
+Check every result directory and convergence diagnostics. Scheduler success
+alone does not establish scientific recovery. These cluster output names
+differ from the local workflow; adapt an explicit release plan accordingly.

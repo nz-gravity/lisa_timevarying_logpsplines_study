@@ -4,12 +4,12 @@ import numpy as np
 import xarray as xr
 from log_psplines import PowerConfig, PowerData, PowerPartition, fit, mask_power
 
+from ._preparation import robust_training_psd_scale
 from .models import parametric_spectrum
-from .preparation import robust_training_psd_scale
 from .settings import surface_config
 
 
-def fit_parametric(h, settings):
+def fit_parametric(h, settings, *, seed: int = 20260906):
     """Fit the seven shared foreground and noise parameters to A/E/T powers."""
     g = h["para"]
     data = PowerData(
@@ -31,12 +31,14 @@ def fit_parametric(h, settings):
             )
         )
     )
-    config = PowerConfig(**settings, seed=20260906, dense_mass=True)
+    config = PowerConfig(**settings, seed=seed, dense_mass=True)
     result = fit(data, config, model=model, true_psd=g["truth"][()])
     return result
 
 
-def fit_surface(h, settings, name, channel, profile, knots=None):
+def fit_surface(
+    h, settings, name, channel, profile, knots=None, *, seed: int | None = None
+):
     """Fit a tensor surface or reference-normalized ANOVA correction."""
     g = h["native"]
     c = ("A", "E", "T").index(channel)
@@ -51,7 +53,7 @@ def fit_surface(h, settings, name, channel, profile, knots=None):
     config = PowerConfig(
         **settings,
         **surface_config(h, name, channel, profile, knots),
-        seed=20260812 + int(h.attrs["mode"] == "gapped"),
+        seed=seed if seed is not None else 20260812 + int(h.attrs["mode"] == "gapped"),
     )
     result = fit(
         data,

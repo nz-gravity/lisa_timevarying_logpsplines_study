@@ -19,6 +19,18 @@ from log_psplines import (
 )
 from log_psplines.preprocessing.wdm import wdm_periodogram
 
+from ._preparation import (
+    analysis_row_split,
+    gate_gaps,
+    good_time_bins,
+    load_gap_schedule,
+    partition_starts,
+    projected_analytic_channel_noise_components_psd,
+    training_data_pilot_log_psd,
+    wdm_valid_length,
+)
+from .configuration import load_config, paper_config_dir
+from .dataset_bundle import file_hash
 from .galactic import GalacticParameters
 from .lisa_aet import (
     AET_CHANNELS,
@@ -29,16 +41,6 @@ from .parametric_response import (
     projected_response_weights,
     projected_spectral_surface,
 )
-from .preparation import (
-    analysis_row_split,
-    gate_gaps,
-    good_time_bins,
-    load_gap_schedule,
-    partition_starts,
-    projected_analytic_channel_noise_components_psd,
-    training_data_pilot_log_psd,
-    wdm_valid_length,
-)
 
 
 def pooled_mean(values, time, frequency, partition):
@@ -48,23 +50,43 @@ def pooled_mean(values, time, frequency, partition):
     return pooled.power / pooled.counts
 
 
-def prepare(archive: Path, output: Path, *, profile="smoke", mode="continuous"):
+def prepare(
+    archive: Path,
+    output: Path,
+    *,
+    profile="smoke",
+    mode="continuous",
+    config: Path | None = None,
+):
     """Transform XYZ data into a portable analysis bundle."""
     archive, output = Path(archive), Path(output)
     if profile not in ("smoke", "paper") or mode not in ("continuous", "gapped"):
         raise ValueError("unknown preparation profile or observation mode")
     if output.exists():
         raise FileExistsError(output)
-    nt = 32 if profile == "smoke" else 2048
+    config_file = config or (
+        paper_config_dir() / "dataset.json" if profile == "paper" else None
+    )
+    options = load_config(config_file, "preparation") if config_file else {}
+    if config_file:
+        profile = options["profile"]
+    nt = options.get("nt", 32)
     with h5py.File(archive) as h:
+        if profile == "paper" and h.attrs.get("demo", False):
+            raise ValueError(
+                "Synthetic demo input cannot be used for paper preparation"
+            )
         if h["model"].attrs["gb_model"] != "karnesis2021_eq6_v1":
             raise ValueError(
                 "requires an XYZ dataset with the Karnesis foreground response"
             )
+        input_is_demo = bool(h.attrs.get("demo", False))
         dt, t0 = float(h.attrs["dt_seconds"]), float(h.attrs["t0_tcb"])
         n = wdm_valid_length(
             8192 if profile == "smoke" else int(h.attrs["n_samples"]), nt
         )
+        if h["tdi/total"].shape[0] != 3 or h["tdi/total"].shape[1] < n:
+            raise ValueError(f"XYZ input must have shape (3, N), N >= {n}")
         xyz = h["tdi/total"][:, :n]
         data_hash = hashlib.sha256(xyz.tobytes()).hexdigest()
         response = np.moveaxis(
@@ -85,7 +107,7 @@ def prepare(archive: Path, output: Path, *, profile="smoke", mode="continuous"):
         if orbit_hash != h["model"].attrs["orbit_sha256"]:
             raise ValueError("orbit checksum differs from the data-generation receipt")
     duration = n * dt
-    config = Path(__file__).parent / "config"
+    config = paper_config_dir()
     gap_file = config / "paper_gap_schedule.json"
     gap_hash = hashlib.sha256(gap_file.read_bytes()).hexdigest()
     if profile == "paper" and mode == "gapped":
@@ -99,7 +121,9 @@ def prepare(archive: Path, output: Path, *, profile="smoke", mode="continuous"):
             if profile == "smoke"
             else load_gap_schedule(config / "paper_gap_schedule.json", duration)
         )
-    taper = min(3600.0, duration / 100) if profile == "smoke" else 3600.0
+    taper = (
+        min(3600.0, duration / 100) if profile == "smoke" else options["taper_seconds"]
+    )
     nf = n // nt
     df = 1 / (2 * nf * dt)
     trim_low = max(1, int(np.ceil(1e-4 / df)))
@@ -150,7 +174,7 @@ def prepare(archive: Path, output: Path, *, profile="smoke", mode="continuous"):
                 absolute_time,
                 frequency,
                 df,
-                projection_nodes=16,
+                projection_nodes=options.get("projection_nodes", 16),
             )
             oms.append(o)
             tm.append(m)
@@ -197,8 +221,8 @@ def prepare(archive: Path, output: Path, *, profile="smoke", mode="continuous"):
         df,
         para_starts,
         ts,
-        projection_nodes=16,
-        spectral_nodes=16,
+        projection_nodes=options.get("projection_nodes", 16),
+        spectral_nodes=options.get("spectral_nodes", 16),
     )
     # Every time block is split at train/validation/test/gap boundaries.
     para_mask = np.broadcast_to(train[ts, None, None], para_data.power.shape).copy()
@@ -207,6 +231,9 @@ def prepare(archive: Path, output: Path, *, profile="smoke", mode="continuous"):
     with h5py.File(output, "x") as h:
         h.attrs.update(
             schema=1,
+            channels="A,E,T",
+            config_sha256=file_hash(config_file) if config_file else "smoke_defaults",
+            config_json=json.dumps(options),
             preparation_dependencies=json.dumps(
                 {
                     name: version(name)
@@ -227,14 +254,16 @@ def prepare(archive: Path, output: Path, *, profile="smoke", mode="continuous"):
             profile=profile,
             mode=mode,
             source_archive=str(archive.resolve()),
+            source_archive_sha256=file_hash(archive),
+            input_is_demo=input_is_demo,
             tdi_total_sha256=data_hash,
             orbit_sha256=orbit_hash,
             nt=nt,
             n_samples=n,
             dt_seconds=dt,
             wdm_power_to_psd=2 * dt / n,
-            projection_nodes=16,
-            spectral_nodes=16,
+            projection_nodes=options.get("projection_nodes", 16),
+            spectral_nodes=options.get("spectral_nodes", 16),
             injection_json=json.dumps(injection.to_dict()),
         )
 

@@ -1,0 +1,260 @@
+{
+  "schema": 1,
+  "release_scope": "paper_candidate",
+  "random_seeds": {
+    "foreground": 20260805,
+    "surface_continuous": 20260812,
+    "surface_gapped": 20260813,
+    "parametric": 20260906
+  },
+  "artifacts": [
+    {
+      "path": "data/lisa.h5",
+      "type": "simulation_data",
+      "description": "Exact author-supplied XYZ dataset with embedded inputs",
+      "source": "../data/lisa.h5",
+      "manuscript_reference": "Paper dataset",
+      "generated_by": "Author-supplied original dataset; original generation invocation not archived here"
+    },
+    {
+      "path": "data/continuous.h5",
+      "type": "prepared_data",
+      "description": "continuous full-resolution WDM bundle",
+      "source": "../build/continuous.h5",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study prepare data/lisa.h5 build/continuous.h5 --config configs/paper/dataset.json --mode continuous"
+    },
+    {
+      "path": "results/paper/continuous/hagn/run.json",
+      "type": "run_receipt",
+      "description": "continuous hagn configuration and diagnostics receipt",
+      "source": "../results/paper/continuous/hagn/run.json",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/continuous.h5 results/paper/continuous/hagn --config configs/paper/hagn.json"
+    },
+    {
+      "path": "results/paper/continuous/hagn/Hagn_A/inference_data.nc",
+      "type": "posterior",
+      "description": "continuous Hagn_A posterior samples and spectral summaries",
+      "source": "../results/paper/continuous/hagn/Hagn_A/inference_data.nc",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/continuous.h5 results/paper/continuous/hagn --config configs/paper/hagn.json"
+    },
+    {
+      "path": "figure_data/reconstruction_continuous__hagn__Hagn_A.npz",
+      "type": "figure_data",
+      "description": "continuous Hagn_A numerical reconstruction data",
+      "source": "../figures/paper/figure_data/reconstruction_continuous__hagn__Hagn_A.npz",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "figure_data/reconstruction_continuous__hagn__Hagn_A.png",
+      "type": "figure",
+      "description": "continuous Hagn_A reconstruction panel",
+      "source": "../figures/paper/reconstruction_continuous__hagn__Hagn_A/posterior_spectrum.png",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "results/paper/continuous/horb/run.json",
+      "type": "run_receipt",
+      "description": "continuous horb configuration and diagnostics receipt",
+      "source": "../results/paper/continuous/horb/run.json",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/continuous.h5 results/paper/continuous/horb --config configs/paper/horb.json"
+    },
+    {
+      "path": "results/paper/continuous/horb/Horb_A/inference_data.nc",
+      "type": "posterior",
+      "description": "continuous Horb_A posterior samples and spectral summaries",
+      "source": "../results/paper/continuous/horb/Horb_A/inference_data.nc",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/continuous.h5 results/paper/continuous/horb --config configs/paper/horb.json"
+    },
+    {
+      "path": "figure_data/reconstruction_continuous__horb__Horb_A.npz",
+      "type": "figure_data",
+      "description": "continuous Horb_A numerical reconstruction data",
+      "source": "../figures/paper/figure_data/reconstruction_continuous__horb__Horb_A.npz",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "figure_data/reconstruction_continuous__horb__Horb_A.png",
+      "type": "figure",
+      "description": "continuous Horb_A reconstruction panel",
+      "source": "../figures/paper/reconstruction_continuous__horb__Horb_A/posterior_spectrum.png",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "results/paper/continuous/hpara/run.json",
+      "type": "run_receipt",
+      "description": "continuous hpara configuration and diagnostics receipt",
+      "source": "../results/paper/continuous/hpara/run.json",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/continuous.h5 results/paper/continuous/hpara --config configs/paper/hpara.json"
+    },
+    {
+      "path": "results/paper/continuous/hpara/Hpara_AET/inference_data.nc",
+      "type": "posterior",
+      "description": "continuous Hpara_AET posterior samples and spectral summaries",
+      "source": "../results/paper/continuous/hpara/Hpara_AET/inference_data.nc",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/continuous.h5 results/paper/continuous/hpara --config configs/paper/hpara.json"
+    },
+    {
+      "path": "results/paper/continuous/hpara/Hpara_AET/physical_parameters.json",
+      "type": "parameter_draws",
+      "description": "continuous Hpara physical parameter draws",
+      "source": "../results/paper/continuous/hpara/Hpara_AET/physical_parameters.json",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/continuous.h5 results/paper/continuous/hpara --config configs/paper/hpara.json"
+    },
+    {
+      "path": "figure_data/reconstruction_continuous__hpara__Hpara_AET.npz",
+      "type": "figure_data",
+      "description": "continuous Hpara_AET numerical reconstruction data",
+      "source": "../figures/paper/figure_data/reconstruction_continuous__hpara__Hpara_AET.npz",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "figure_data/reconstruction_continuous__hpara__Hpara_AET.png",
+      "type": "figure",
+      "description": "continuous Hpara_AET reconstruction panel",
+      "source": "../figures/paper/reconstruction_continuous__hpara__Hpara_AET/posterior_spectrum.png",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "data/gapped.h5",
+      "type": "prepared_data",
+      "description": "gapped full-resolution WDM bundle",
+      "source": "../build/gapped.h5",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study prepare data/lisa.h5 build/gapped.h5 --config configs/paper/dataset.json --mode gapped"
+    },
+    {
+      "path": "results/paper/gapped/hagn/run.json",
+      "type": "run_receipt",
+      "description": "gapped hagn configuration and diagnostics receipt",
+      "source": "../results/paper/gapped/hagn/run.json",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/gapped.h5 results/paper/gapped/hagn --config configs/paper/hagn.json"
+    },
+    {
+      "path": "results/paper/gapped/hagn/Hagn_A/inference_data.nc",
+      "type": "posterior",
+      "description": "gapped Hagn_A posterior samples and spectral summaries",
+      "source": "../results/paper/gapped/hagn/Hagn_A/inference_data.nc",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/gapped.h5 results/paper/gapped/hagn --config configs/paper/hagn.json"
+    },
+    {
+      "path": "figure_data/reconstruction_gapped__hagn__Hagn_A.npz",
+      "type": "figure_data",
+      "description": "gapped Hagn_A numerical reconstruction data",
+      "source": "../figures/paper/figure_data/reconstruction_gapped__hagn__Hagn_A.npz",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "figure_data/reconstruction_gapped__hagn__Hagn_A.png",
+      "type": "figure",
+      "description": "gapped Hagn_A reconstruction panel",
+      "source": "../figures/paper/reconstruction_gapped__hagn__Hagn_A/posterior_spectrum.png",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "results/paper/gapped/horb/run.json",
+      "type": "run_receipt",
+      "description": "gapped horb configuration and diagnostics receipt",
+      "source": "../results/paper/gapped/horb/run.json",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/gapped.h5 results/paper/gapped/horb --config configs/paper/horb.json"
+    },
+    {
+      "path": "results/paper/gapped/horb/Horb_A/inference_data.nc",
+      "type": "posterior",
+      "description": "gapped Horb_A posterior samples and spectral summaries",
+      "source": "../results/paper/gapped/horb/Horb_A/inference_data.nc",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/gapped.h5 results/paper/gapped/horb --config configs/paper/horb.json"
+    },
+    {
+      "path": "figure_data/reconstruction_gapped__horb__Horb_A.npz",
+      "type": "figure_data",
+      "description": "gapped Horb_A numerical reconstruction data",
+      "source": "../figures/paper/figure_data/reconstruction_gapped__horb__Horb_A.npz",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "figure_data/reconstruction_gapped__horb__Horb_A.png",
+      "type": "figure",
+      "description": "gapped Horb_A reconstruction panel",
+      "source": "../figures/paper/reconstruction_gapped__horb__Horb_A/posterior_spectrum.png",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "results/paper/gapped/hpara/run.json",
+      "type": "run_receipt",
+      "description": "gapped hpara configuration and diagnostics receipt",
+      "source": "../results/paper/gapped/hpara/run.json",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/gapped.h5 results/paper/gapped/hpara --config configs/paper/hpara.json"
+    },
+    {
+      "path": "results/paper/gapped/hpara/Hpara_AET/inference_data.nc",
+      "type": "posterior",
+      "description": "gapped Hpara_AET posterior samples and spectral summaries",
+      "source": "../results/paper/gapped/hpara/Hpara_AET/inference_data.nc",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/gapped.h5 results/paper/gapped/hpara --config configs/paper/hpara.json"
+    },
+    {
+      "path": "results/paper/gapped/hpara/Hpara_AET/physical_parameters.json",
+      "type": "parameter_draws",
+      "description": "gapped Hpara physical parameter draws",
+      "source": "../results/paper/gapped/hpara/Hpara_AET/physical_parameters.json",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study fit build/gapped.h5 results/paper/gapped/hpara --config configs/paper/hpara.json"
+    },
+    {
+      "path": "figure_data/reconstruction_gapped__hpara__Hpara_AET.npz",
+      "type": "figure_data",
+      "description": "gapped Hpara_AET numerical reconstruction data",
+      "source": "../figures/paper/figure_data/reconstruction_gapped__hpara__Hpara_AET.npz",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "figure_data/reconstruction_gapped__hpara__Hpara_AET.png",
+      "type": "figure",
+      "description": "gapped Hpara_AET reconstruction panel",
+      "source": "../figures/paper/reconstruction_gapped__hpara__Hpara_AET/posterior_spectrum.png",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "figure_data/heldout_metrics.csv",
+      "type": "figure_metadata",
+      "description": "Figure metadata: figure_data/heldout_metrics.csv",
+      "source": "../figures/paper/figure_data/heldout_metrics.csv",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    },
+    {
+      "path": "figure_data/figures.json",
+      "type": "figure_metadata",
+      "description": "Figure metadata: figures.json",
+      "source": "../figures/paper/figures.json",
+      "manuscript_reference": "Paper reconstruction; final figure/table number pending",
+      "generated_by": "lisa-study figures --results results/paper --output figures/paper"
+    }
+  ]
+}

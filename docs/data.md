@@ -42,13 +42,13 @@ deposit. See the [upstream license](https://github.com/esa/lisa-orbit-files/blob
 To regenerate the foreground and combine it with the same instrument noise:
 
 ```sh
-uv run --locked lisa-study generate output/generated.h5 --source data/lisa.h5
+uv run --locked lisa-study generate build/generated.h5 --source data/lisa.h5
 ```
 
 Alternatively, supply both inputs explicitly:
 
 ```sh
-uv run --locked lisa-study generate output/generated.h5 \
+uv run --locked lisa-study generate build/generated.h5 \
   --noise data/instrument-noise.h5 --orbits data/orbits.h5
 ```
 
@@ -67,3 +67,11 @@ noise input is supported.
 
 Full-duration foreground generation can be expensive. A quick demonstration
 can prepare the supplied dataset directly without repeating generation.
+
+## Offline execution fixture
+
+`lisa-study generate build/demo.h5 --demo` creates fixed-seed Gaussian XYZ
+samples with a static triangular orbit and an artificial foreground response.
+It needs no downloaded or authored dataset. It is a synthetic I/O fixture,
+not a physical LISA simulation; paper preparation rejects it. The real
+`generate --source` and `generate --noise ... --orbits ...` paths are unchanged.

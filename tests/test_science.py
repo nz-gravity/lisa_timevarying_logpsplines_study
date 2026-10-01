@@ -7,6 +7,7 @@ from log_psplines.inference.parametric_power import prepare_parametric_power_mod
 from numpyro import distributions as dist
 from numpyro.infer.util import log_density
 
+from lisa_psd_analysis._preparation import analysis_row_split, partition_starts
 from lisa_psd_analysis.galactic import (
     galactic_psd,
     log_galactic_psd_jax,
@@ -14,7 +15,6 @@ from lisa_psd_analysis.galactic import (
 )
 from lisa_psd_analysis.lisa_aet import XYZ_TO_AET, xyz_covariance_to_aet_diagonal
 from lisa_psd_analysis.models import parametric_spectrum
-from lisa_psd_analysis.preparation import analysis_row_split, partition_starts
 from lisa_psd_analysis.wdm_projection import wdm_frequency_projection_grid
 
 

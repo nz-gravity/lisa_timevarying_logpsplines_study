@@ -15,6 +15,11 @@ def main() -> None:
     generate.add_argument(
         "--source", type=Path, help="dataset containing embedded noise and orbits"
     )
+    generate.add_argument(
+        "--demo",
+        action="store_true",
+        help="offline synthetic execution fixture; never paper data",
+    )
     generate.add_argument("--noise", type=Path)
     generate.add_argument("--orbits", type=Path)
     orbits = commands.add_parser(
@@ -28,6 +33,7 @@ def main() -> None:
     )
     prepare.add_argument("archive", type=Path)
     prepare.add_argument("output", type=Path)
+    prepare.add_argument("--config", type=Path, help="paper preparation JSON")
     prepare.add_argument("--profile", choices=["smoke", "paper"], default="smoke")
     prepare.add_argument(
         "--mode", choices=["continuous", "gapped"], default="continuous"
@@ -40,12 +46,15 @@ def main() -> None:
         "--models",
         nargs="+",
         choices=["Hagn", "Horb", "Hpara"],
-        default=["Hagn", "Horb", "Hpara"],
+        default=None,
     )
-    fit.add_argument("--channels", nargs="+", choices=["A", "E"], default=["A"])
+    fit.add_argument("--channels", nargs="+", choices=["A", "E"], default=None)
+    fit.add_argument(
+        "--config", type=Path, help="paper analysis JSON; explicit flags override it"
+    )
     fit.add_argument("--warmup", type=int)
     fit.add_argument("--samples", type=int)
-    fit.add_argument("--chains", type=int, default=2)
+    fit.add_argument("--chains", type=int)
     fit.add_argument("--knots", type=Path)
     fit.add_argument("--max-tree-depth", type=int)
     verify = commands.add_parser(
@@ -55,11 +64,34 @@ def main() -> None:
     verify.add_argument(
         "--bundle", type=Path, help="prepared bundle, if moved since the run"
     )
+    figures = commands.add_parser(
+        "figures", help="regenerate reconstruction figures from saved posteriors"
+    )
+    figures.add_argument("--results", type=Path, required=True)
+    figures.add_argument("--output", type=Path, required=True)
+    release = commands.add_parser(
+        "package-release",
+        help="package explicitly selected scientific artifacts for Zenodo",
+    )
+    release.add_argument("output", type=Path)
+    release.add_argument(
+        "--plan",
+        type=Path,
+        required=True,
+        help="JSON manifest of individual source files",
+    )
+    verify_release_parser = commands.add_parser(
+        "verify-release",
+        help="verify release inventory, checksums, metadata and saved results",
+    )
+    verify_release_parser.add_argument("output", type=Path)
     args = vars(parser.parse_args())
     command = args.pop("command")
+    from .figures import make_figures
     from .generate import generate_dataset
     from .orbits import fetch_orbits
     from .prepare import prepare as prepare_dataset
+    from .release import package_release, verify_release
     from .run import run_analysis
     from .verification import verify_run
 
@@ -69,9 +101,12 @@ def main() -> None:
         "prepare": prepare_dataset,
         "fit": run_analysis,
         "verify": verify_run,
+        "figures": make_figures,
+        "package-release": package_release,
+        "verify-release": verify_release,
     }
     try:
         result = actions[command](**args)
-    except (ValueError, FileExistsError, FileNotFoundError) as error:
+    except (ValueError, OSError, KeyError) as error:
         parser.error(str(error))
     print(json.dumps(result, indent=2) if isinstance(result, dict) else result)

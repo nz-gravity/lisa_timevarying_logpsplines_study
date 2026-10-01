@@ -34,8 +34,8 @@ logpsplinepsd = {path = "../LogPSplinePSD", editable = true}
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-lisa_psd_analysis = ["config/*.json"]
+[tool.setuptools.data-files]
+"share/lisa-study/configs/paper" = ["configs/paper/*.json"]
 
 [tool.ruff]
 line-length = 88

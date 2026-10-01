@@ -7,9 +7,9 @@ equations. Line numbers should be generated from the final release commit.
 | --- | --- |
 | `eq:karnesis_foreground` | [`galactic.log_galactic_psd`](../src/lisa_psd_analysis/galactic.py), and its JAX counterpart |
 | `eq:lisa_aet_matrix` | [`lisa_aet.XYZ_TO_AET`](../src/lisa_psd_analysis/lisa_aet.py) |
-| `eq:lisa_gap_guard` | [`preparation.good_time_bins`](../src/lisa_psd_analysis/preparation.py) |
+| `eq:lisa_gap_guard` | [`_preparation.good_time_bins`](../src/lisa_psd_analysis/_preparation.py) |
 | `eq:h_agn` | [`fitting.fit_surface`](../src/lisa_psd_analysis/fitting.py), selecting tensor structure |
-| `eq:lisa_reference_definition` | [`preparation.projected_analytic_channel_noise_components_psd`](../src/lisa_psd_analysis/preparation.py) |
+| `eq:lisa_reference_definition` | [`_preparation.projected_analytic_channel_noise_components_psd`](../src/lisa_psd_analysis/_preparation.py) |
 | `eq:h_orb`, `eq:lisa_residual_decomposition` | [`fitting.fit_surface`](../src/lisa_psd_analysis/fitting.py), selecting ANOVA structure |
 | `eq:h_para_amplitude`, `eq:h_para_total` | [`models.parametric_spectrum`](../src/lisa_psd_analysis/models.py) |
 | WDM response projection | [`wdm_projection.wdm_frequency_projection_grid`](../src/lisa_psd_analysis/wdm_projection.py) |

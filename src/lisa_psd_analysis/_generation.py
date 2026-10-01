@@ -202,6 +202,10 @@ def build_dataset(output_path: Path, *, noise_path: Path, orbit_path: Path) -> d
     orbits = load_orbits(orbit_path)
     noise_series, data_t0, native_dt = load_instrument_noise(noise_path)
     n_samples = (noise_series.shape[1] // SYNTHESIS_HOP) * SYNTHESIS_HOP
+    if n_samples < SYNTHESIS_HOP:
+        raise ValueError(
+            f"Instrument noise requires at least {SYNTHESIS_HOP} samples at {TARGET_DT} s cadence"
+        )
     noise_series = noise_series[:, :n_samples]
 
     truth_time_tcb = (
@@ -253,6 +257,9 @@ def build_dataset(output_path: Path, *, noise_path: Path, orbit_path: Path) -> d
     with h5py.File(output_path, "x") as hdf:
         hdf.attrs.update(
             {
+                "random_seed": SEED,
+                "synthesis_length": SYNTHESIS_LENGTH,
+                "synthesis_hop": SYNTHESIS_HOP,
                 "t0_tcb": data_t0,
                 "dt_seconds": TARGET_DT,
                 "native_noise_dt_seconds": native_dt,

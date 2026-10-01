@@ -11,11 +11,11 @@ if [[ ! "$remote" =~ ^/[A-Za-z0-9_./-]+$ ]]; then
     echo 'Use an absolute remote path without spaces or shell characters.' >&2
     exit 2
 fi
-ssh ozstar "test ! -e '$remote' && mkdir -p '$remote/lisa_psd_analysis' '$remote/LogPSplinePSD'"
-rsync -a --exclude='.git' --exclude='.venv' --exclude='output' --exclude='data' \
+ssh ozstar "test ! -e '$remote' && mkdir -p '$remote/lisa_timevarying_logpsplines_study' '$remote/LogPSplinePSD'"
+rsync -a --exclude='.git' --exclude='.venv' --exclude='output' --exclude='data' --exclude='results' --exclude='figures' --exclude='release' --exclude='build' --exclude='graphify-out' \
     --exclude='__pycache__' --exclude='*.egg-info' --exclude='.*cache' --exclude='dist' \
-    ./ "ozstar:$remote/lisa_psd_analysis/"
-# Include only the library's build inputs, implementation and tests.
+    ./ "ozstar:$remote/lisa_timevarying_logpsplines_study/"
+# Include only the library's build inputs and implementation.
 rsync -a ../LogPSplinePSD/pyproject.toml ../LogPSplinePSD/README.rst \
     "ozstar:$remote/LogPSplinePSD/"
 rsync -a --exclude='__pycache__' --exclude='*.egg-info' \
