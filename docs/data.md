@@ -11,9 +11,12 @@ The study input is one HDF5 file, `lisa.h5`, containing:
 | `truth` | Component and total spectra used for diagnostics |
 | `inputs` | Exact instrument-noise and sampled-orbit files, with SHA-256 checksums |
 
-Preparation reads this file without needing network access. Share it alongside
-the software deposits to reproduce the same realization. It is not currently
-included in the source tree or available through a published deposit URL.
+Download `raw_data.h5` from the [published dataset](https://doi.org/10.5281/zenodo.23092878).
+It is the original study input; the CLI accepts its deposited filename directly.
+The examples below use `data/lisa.h5`: save or link `raw_data.h5` at that path.
+The deposit also supplies `data_continuous.h5` and `data_gapped.h5`, so loading
+the saved results does not require repeating preparation. Verify downloads with
+`shasum -a 256 -c checksums.sha256`.
 
 ## Download ESA orbits
 

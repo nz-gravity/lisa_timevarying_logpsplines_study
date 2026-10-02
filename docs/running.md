@@ -49,8 +49,8 @@ The legacy `--profile paper` interface still selects these versioned settings.
 
 Hagn's A layouts have 10 time/128 frequency interior knots; Horb has 3 time/12
 frequency knots. HalfNormal(10) roughness and Horb's HalfNormal(.5) interaction
-are unchanged. Layouts check the dataset identity before use. Paper E layouts
-remain unfinished; do not apply A layouts to E.
+are unchanged. Layouts check the dataset identity before use. The published surface analyses use A; these dataset-specific layouts must
+not be reused for E.
 
 For another dataset or an E surface fit, select one model/channel and provide
 `--knots path/to/layout.json`. Fields: `channel`, `mode`, `model` (`agn`/`orb`),
@@ -77,3 +77,13 @@ inspection/reconstruction, especially Hpara response operators.
 The held-out metrics use each fit's native/pooled grid; they are not a
 common-support model comparison. `figures` exports reconstruction panels and
 these existing metrics without rerunning inference.
+
+## Artifact checks
+
+`verify` checks input identity, posterior metadata, finite likelihoods, positive
+spectra and chain/draw counts. These are integrity checks; inspect R-hat, ESS,
+divergences, tree-depth saturation and E-BFMI separately.
+
+Saved `.nc` files contain HDF5-backed arrays, including complex spectral
+matrices. Use `PSDResult` or the deposited h5py notebook to read them; support
+for arbitrary NetCDF clients is not guaranteed.

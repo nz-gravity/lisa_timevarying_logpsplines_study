@@ -1,9 +1,8 @@
-"""Offline study workflow and archival integrity; no full paper inference."""
+"""Offline data preparation and analysis workflow; no full paper inference."""
 
 import json
 import subprocess
 import sys
-from pathlib import Path
 
 import h5py
 import numpy as np
@@ -13,8 +12,6 @@ from lisa_psd_analysis.configuration import load_config, paper_config_dir
 from lisa_psd_analysis.dataset_bundle import file_hash
 from lisa_psd_analysis.generate import generate_dataset
 from lisa_psd_analysis.lisa_aet import XYZ_TO_AET, xyz_to_aet_series
-from lisa_psd_analysis.provenance import release_provenance
-from lisa_psd_analysis.release import package_release, verify_release
 
 
 def cli(*arguments: str) -> str:
@@ -105,107 +102,6 @@ def test_configs_and_bad_fields(tmp_path):
         file_hash(directory / "paper_gap_schedule.json")
         == contract["gap_schedule_sha256"]
     )
-
-
-def release_plan(root, archive, bundle, run):
-    files = [
-        archive,
-        bundle,
-        run / "run.json",
-        *sorted(run.glob("*/inference_data.nc")),
-    ]
-    artifacts = []
-    for source in files:
-        if source == archive:
-            path, kind = "data/demo.h5", "simulation_data"
-        elif source == bundle:
-            path, kind = "data/prepared.h5", "prepared_data"
-        else:
-            path = "results/run/" + source.relative_to(run).as_posix()
-            kind = "run_receipt" if source.suffix == ".json" else "posterior"
-        artifacts.append(
-            dict(
-                path=path,
-                type=kind,
-                description="Tiny execution fixture",
-                source=str(source),
-                manuscript_reference="Smoke only",
-                generated_by="pytest offline CLI smoke",
-            )
-        )
-    plan = root / "release-plan.json"
-    plan.write_text(
-        json.dumps(
-            dict(
-                schema=1,
-                release_scope="smoke",
-                random_seeds={"demo": 12345},
-                artifacts=artifacts,
-            )
-        )
-    )
-    return plan
-
-
-def test_tiny_release_and_tampering(smoke_run):
-    root, archive, bundle, run = smoke_run
-    release = package_release(
-        root / "release", plan=release_plan(root, archive, bundle, run)
-    )
-    assert verify_release(release)["release_valid"]
-    assert all(
-        (release / name).exists()
-        for name in (
-            "MANIFEST.csv",
-            "checksums.sha256",
-            "provenance.json",
-            "README.md",
-            "data",
-            "results",
-            "configs",
-            "figure_data",
-        )
-    )
-    provenance = json.loads((release / "provenance.json").read_text())
-    assert provenance["study"]["git_sha"] and provenance["logpsplinepsd"]["version"]
-    assert provenance["random_seeds"] and provenance["runs"]
-    (release / "data/demo.h5").write_bytes(b"tampered")
-    with pytest.raises(ValueError, match="Checksum mismatch"):
-        verify_release(release)
-
-
-def test_release_rejects_escape_and_missing_source(smoke_run):
-    root, archive, bundle, run = smoke_run
-    plan = release_plan(root, archive, bundle, run)
-    config = json.loads(plan.read_text())
-    config["artifacts"][0]["path"] = "../escape.h5"
-    plan.write_text(json.dumps(config))
-    with pytest.raises(ValueError, match="contained"):
-        package_release(root / "escaped", plan=plan)
-    assert not (root / "escaped").exists()
-    config["artifacts"][0]["path"] = "data/demo.h5"
-    config["artifacts"][0]["source"] = "missing.h5"
-    plan.write_text(json.dumps(config))
-    with pytest.raises(ValueError, match="existing regular file"):
-        package_release(root / "missing", plan=plan)
-
-
-def test_generated_provenance_fields():
-    root = Path(__file__).resolve().parents[1]
-    receipt = release_provenance(root, {"test": 123}, {"dataset.json": "test checksum"})
-    for key in (
-        "study_repository_url",
-        "python_version",
-        "dependency_lock_sha256",
-        "jax_version",
-        "numpyro_version",
-        "platform",
-        "random_seeds",
-        "paper_configs",
-        "created_at",
-    ):
-        assert receipt[key]
-    assert len(receipt["dependency_lock_sha256"]) == 64
 
 
 def test_figures_read_saved_results(smoke_run):

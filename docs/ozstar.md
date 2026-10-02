@@ -1,7 +1,7 @@
 # Manual OzSTAR runs
 
 These instructions and scripts are for the researcher to run manually. No
-remote jobs are submitted by the local tests or cleanup tooling.
+remote jobs are submitted by the local tests.
 The supplied jobs request account `oz200`, six CPUs and 32 GB. Adjust resources
 for your allocation. All inference runs on compute nodes.
 
@@ -53,7 +53,7 @@ bash slurm/submit_main.sh results/pilot results/paper-cluster --execute
 
 The six fits use the versioned paper settings via the backwards-compatible
 `--profile paper` interface. Walltime defaults to 24 hours; `--time HH:MM:SS`
-overrides it. Choose a new output root. Paper E layouts remain unfinished.
+overrides it. Choose a new output root. The supplied surface configurations use A.
 
 ```sh
 squeue -u "$USER"

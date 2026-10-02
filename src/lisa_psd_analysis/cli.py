@@ -69,29 +69,12 @@ def main() -> None:
     )
     figures.add_argument("--results", type=Path, required=True)
     figures.add_argument("--output", type=Path, required=True)
-    release = commands.add_parser(
-        "package-release",
-        help="package explicitly selected scientific artifacts for Zenodo",
-    )
-    release.add_argument("output", type=Path)
-    release.add_argument(
-        "--plan",
-        type=Path,
-        required=True,
-        help="JSON manifest of individual source files",
-    )
-    verify_release_parser = commands.add_parser(
-        "verify-release",
-        help="verify release inventory, checksums, metadata and saved results",
-    )
-    verify_release_parser.add_argument("output", type=Path)
     args = vars(parser.parse_args())
     command = args.pop("command")
     from .figures import make_figures
     from .generate import generate_dataset
     from .orbits import fetch_orbits
     from .prepare import prepare as prepare_dataset
-    from .release import package_release, verify_release
     from .run import run_analysis
     from .verification import verify_run
 
@@ -102,8 +85,6 @@ def main() -> None:
         "fit": run_analysis,
         "verify": verify_run,
         "figures": make_figures,
-        "package-release": package_release,
-        "verify-release": verify_release,
     }
     try:
         result = actions[command](**args)
