@@ -56,7 +56,8 @@ Large data and results are kept outside Git.
 ## Citation
 
 Data and posterior results: [10.5281/zenodo.23092878](https://doi.org/10.5281/zenodo.23092878).
-Study software, v0.1.0: [10.5281/zenodo.23076397](https://doi.org/10.5281/zenodo.23076397).
+Study software: [v0.1.1](https://github.com/nz-gravity/lisa_timevarying_logpsplines_study/releases/tag/v0.1.1),
+[Zenodo archive](https://doi.org/10.5281/zenodo.23076396).
 LogPSplinePSD, v0.2.0: [10.5281/zenodo.23076395](https://doi.org/10.5281/zenodo.23076395).
 The saved run receipts record the software used for each fit.
 
